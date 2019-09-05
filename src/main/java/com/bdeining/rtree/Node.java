@@ -1,16 +1,23 @@
 package com.bdeining.rtree;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
-
 import java.util.List;
 
 public interface Node {
 
-    Coordinate getCoordinate();
+  List<Coordinate> getCoordinates();
 
-    List<Node> getChildren();
+  List<Node> getChildren();
 
-    void setChildren(List<Node> children);
+  void setChildren(List<Node> children);
 
+  void addCoordinate(Coordinate coordinate);
+
+  boolean isRoot();
+
+  void setIsRoot(boolean isRoot);
+
+  void setMbr(int mbr);
+
+  int getMbr();
 }

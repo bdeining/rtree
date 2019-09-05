@@ -1,5 +1,7 @@
 package com.bdeining.rtree;
 
+import java.util.Random;
+import java.util.UUID;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -13,86 +15,82 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
-import java.util.Random;
-import java.util.UUID;
-
-
 public class HbaseClient {
 
-    private Random random = new Random();
+  private Random random = new Random();
 
-    public static void main(String[] args) {
-        try {
-            new HbaseClient().buildNormalIndex();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+  public static void main(String[] args) {
+    try {
+      new HbaseClient().buildNormalIndex();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void buildNormalIndex() throws Exception {
+    Configuration conf = HBaseConfiguration.create();
+    Connection connection = ConnectionFactory.createConnection(conf);
+
+    HBaseAdmin admin = (HBaseAdmin) connection.getAdmin();
+
+    TableName tablename = TableName.valueOf("test_table");
+    ColumnFamilyDescriptor name = new ModifyableColumnFamilyDescriptor("title".getBytes());
+    ColumnFamilyDescriptor wkt = new ModifyableColumnFamilyDescriptor("wkt".getBytes());
+
+    TableDescriptor tableDescriptor =
+        TableDescriptorBuilder.newBuilder(tablename)
+            .setColumnFamily(name)
+            .setColumnFamily(wkt)
+            .build();
+
+    if (!admin.tableExists(tablename)) {
+      admin.createTable(tableDescriptor);
     }
 
-    private void buildNormalIndex() throws Exception {
-        Configuration conf = HBaseConfiguration.create();
-        Connection connection = ConnectionFactory.createConnection(conf);
+    Table table = connection.getTable(tablename);
 
-        HBaseAdmin admin = (HBaseAdmin) connection.getAdmin();
-
-        TableName tablename = TableName.valueOf("test_table");
-        ColumnFamilyDescriptor name = new ModifyableColumnFamilyDescriptor("title".getBytes());
-        ColumnFamilyDescriptor wkt = new ModifyableColumnFamilyDescriptor("wkt".getBytes());
-
-        TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(tablename).setColumnFamily(name).setColumnFamily(wkt).build();
-
-        if (!admin.tableExists(tablename)) {
-            admin.createTable(tableDescriptor);
-        }
-
-        Table table = connection.getTable(tablename);
-
-        //put 'test_table', 'r1', 'name', 'value', 10
-        for (long i=0; i < 100; i ++) {
-            Put put = new Put(("r" + i).getBytes());
-            put.addColumn("title".getBytes(), "value".getBytes(), UUID.randomUUID().toString().getBytes());
-            put.addColumn("wkt".getBytes(), "value".getBytes(), getRandomWkt().getBytes());
-            table.put(put);
-        }
-
-        connection.close();
+    // put 'test_table', 'r1', 'name', 'value', 10
+    for (long i = 0; i < 100; i++) {
+      Put put = new Put(("r" + i).getBytes());
+      put.addColumn(
+          "title".getBytes(), "value".getBytes(), UUID.randomUUID().toString().getBytes());
+      put.addColumn("wkt".getBytes(), "value".getBytes(), getRandomWkt().getBytes());
+      table.put(put);
     }
 
-    private String getRandomWkt() {
-        double lat = randomDouble(-90, 90);
-        double lon = randomDouble(-180, 180);
-        return String.format("POINT (%f %f)", lat, lon);
-    }
+    connection.close();
+  }
 
-    private double randomDouble(int rangeMin, int rangeMax) {
-        return rangeMin + (rangeMax - rangeMin) * random.nextDouble();
-    }
+  private String getRandomWkt() {
+    double lat = randomDouble(-90, 90);
+    double lon = randomDouble(-180, 180);
+    return String.format("POINT (%f %f)", lat, lon);
+  }
 
-    private void buildRTreeIndex() throws Exception {
+  private double randomDouble(int rangeMin, int rangeMax) {
+    return rangeMin + (rangeMax - rangeMin) * random.nextDouble();
+  }
 
-        Configuration conf = HBaseConfiguration.create();
-        Connection connection = ConnectionFactory.createConnection(conf);
+  private void buildRTreeIndex() throws Exception {
 
-        TableName tablename = TableName.valueOf("test_table");
+    Configuration conf = HBaseConfiguration.create();
+    Connection connection = ConnectionFactory.createConnection(conf);
 
-/*        HBaseAdmin admin = (HBaseAdmin) connection.getAdmin();
-        //HBaseAdmin admin = new HBaseAdmin(conf);
+    TableName tablename = TableName.valueOf("test_table");
 
-
-
-/*        TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(tablename).build();
-        admin.createTable(tableDescriptor);*/
+    /*        HBaseAdmin admin = (HBaseAdmin) connection.getAdmin();
+            //HBaseAdmin admin = new HBaseAdmin(conf);
 
 
 
-        Table table = connection.getTable(tablename);
+    /*        TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(tablename).build();
+            admin.createTable(tableDescriptor);*/
 
-        System.out.println(table);
+    Table table = connection.getTable(tablename);
 
+    System.out.println(table);
 
-
-
-/*
+    /*
         Configuration config = HBaseConfiguration.create();
         Job job = new Job(config, "ExampleReadWrite");
         job.setJarByClass(HbaseClient.class);    // class that contains mapper
@@ -123,6 +121,5 @@ public class HbaseClient {
         }
 
     }*/
-    }
-
+  }
 }
