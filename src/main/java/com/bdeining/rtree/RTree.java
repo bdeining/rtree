@@ -58,7 +58,6 @@ public class RTree {
 
       root.addCoordinate(coordinate);
 
-      // if overflow
       if ((root.getCoordinates().size() + 1) == listSize) {
         handleOverflow(root);
       }
@@ -117,21 +116,19 @@ public class RTree {
     return root;
   }
 
-  /*
-      Algorithm handle-overflow(u)
-  1. split(u) into u and u
-  2. if u is the root then
-  3. create a new root with u and u as its child nodes
-  4. else
-  5. w ← the parent of u
-  6. update MBR(u) in w
-  7. add u
-  0
-  as a child of w
-  8. if w overflows then
-  9. handle-overflow(w)
-       */
-
+    /**
+     *   split(u) into u and u
+     *   if u is the root then
+     *      create a new root with u and u as its child nodes
+     *   else
+     *      w ← the parent of u
+     *      update MBR(u) in w
+     *      add u' as a child of w
+     *      if w overflows then
+     *      handle-overflow(w)
+     *
+     * @param node u
+     */
   private void handleOverflow(Node node) {
 
     Node[] splitNodes = split(node);
@@ -148,19 +145,20 @@ public class RTree {
     }
   }
 
-  /*
-      Algorithm split(u)
-  1. m = the number of points in u
-  2. sort the points of u on x-dimension
-  3. for i = d0.4Be to m − d0.4Be
-  4. S1 ← the set of the first i points in the list
-  5. S2 ← the set of the other i points in the list
-  6. calculate the perimeter sum of MBR(S1) and MBR(S2); record it
-  if this is the best split so far
-  7. Repeat Lines 2-6 with respect to y-dimension
-  8. return the best split found
-       */
-
+    /**
+     *   m = the number of points in u
+     *   sort the points of u on x-dimension
+     *   for i = ciel0.4B to m − ciel0.4B
+     *   S1 ← the set of the first i points in the list
+     *   S2 ← the set of the other i points in the list
+     *   calculate the perimeter sum of MBR(S1) and MBR(S2); record it
+     *   if this is the best split so far
+     *      Repeat Lines 2-6 with respect to y-dimension
+     *      return the best split found
+     *
+     * @param node u
+     * @return
+     */
   private Node[] split(Node node) {
     int m = node.getCoordinates().size();
 
