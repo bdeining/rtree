@@ -30,6 +30,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-common</artifactId>
             <version>2.2.0</version>
         </dependency>
@@ -38,6 +43,7 @@
             <artifactId>hadoop-mapreduce-client-core</artifactId>
             <version>3.2.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-common</artifactId>
@@ -49,11 +55,23 @@
             <version>2.2.0</version>
         </dependency>
         <dependency>
+            <groupId>com.conversantmedia</groupId>
+            <artifactId>rtree</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
-            <version>1.13</version>
+            <artifactId>jts-core</artifactId>
+            <version>1.14.0</version>
         </dependency>
     </dependencies>
+
+
 
     <profiles>
 
@@ -62,6 +80,31 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+<!--                                <excludes>
+                                    <exclude>org.apache.hbase:*</exclude>
+                                    <exclude>org.slf4j:*</exclude>
+                                </excludes>-->
+                                <includes>
+                                    <include>com.conversantmedia:rtree</include>
+                                    <include>com.vividsolutions:jts-core</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.coveo</groupId>
                 <artifactId>fmt-maven-plugin</artifactId>

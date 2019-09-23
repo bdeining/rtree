@@ -1,1 +1,22 @@
+./stop-hbase.sh
+./start-hbase.sh
+
+./hbase shell
+
+create 'test_table', 'title', 'wkt'
+
+
+disable 'test_table'
+drop 'test_table'
+
 scan 'test_table'
+truncate 'test_table'
+
+
+
+
+put 'test_table', 'r3', 'title', 'title'
+put 'test_table', 'r4', 'wkt', 'POINT (11, 11)'
+
+
+grep -R "Creating Table" *
